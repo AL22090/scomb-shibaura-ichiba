@@ -149,27 +149,31 @@ function getTimeTable(){
         //時間割のセルごとに処理，ただし，クォーター制の授業を第１，第２クォーターの両方取っている場合，両方の情報がcellに含まれるため，両方の情報を取得する
         let day = Enum_day.MON;
         col.forEach((cell)=>{
-            const class_data = Array.from(cell.getElementsByClassName('clearfix permit-student'));
-            if(class_data.length > 0){
-                class_data.forEach((data) => {
-                    const detail = data.getElementsByClassName('div-table-cell-detail')[0];
-                    const teacherNames = detail.querySelectorAll('span');
-                    let teacherName = "";
-                    teacherNames.forEach((name) => {
-                        //nameから,を削除
-                        let tmp = name.textContent;
-                        tmp = tmp.replace(",", "");
-                        //nameの冒頭のスペースを削除
-                        tmp = tmp.trimStart();
-                        teacherName += tmp;
-                        teacherName += ", ";
+            try{
+                const class_data = Array.from(cell.getElementsByClassName('clearfix permit-student'));
+                if(class_data.length > 0){
+                    class_data.forEach((data) => {
+                        const detail = data.getElementsByClassName('div-table-cell-detail')[0];
+                        const teacherNames = detail.querySelectorAll('span');
+                        let teacherName = "";
+                        teacherNames.forEach((name) => {
+                            //nameから,を削除
+                            let tmp = name.textContent;
+                            tmp = tmp.replace(",", "");
+                            //nameの冒頭のスペースを削除
+                            tmp = tmp.trimStart();
+                            teacherName += tmp;
+                            teacherName += ", ";
+                        });
+                        //最後の,を削除
+                        teacherName = teacherName.slice(0, -2);
+                        str += /*getDay(day) + ", " + time + ", " + */getNameOfClass(data.textContent) + ", " + teacherName + "\n"; // 曜日と時限は必要なくなった．
                     });
-                    //最後の,を削除
-                    teacherName = teacherName.slice(0, -2);
-                    str += getDay(day) + ", " + time + ", " + getNameOfClass(data.textContent) + ", " + teacherName + "\n";
-                });
+                }
+                day = (day + 1) % 7;
+            }catch(e){ // エラーが発生した場合，その授業はスキップする．
+                console.error(e);
             }
-            day = (day + 1) % 7;
         });
         time++;
     });

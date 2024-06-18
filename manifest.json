@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "Page Button Adder",
+    "name": "Scomb-Shibaura-Ichiba",
     "version": "1.0",
     "description": "Adds a button to specified pages.",
     "icons": {
@@ -10,7 +10,8 @@
     },
     "permissions": [
         "activeTab",
-        "scripting"
+        "scripting",
+        "clipboardWrite"
     ],
     "content_scripts": [
         {
@@ -20,7 +21,6 @@
         }
     ],
     "action": {
-        "default_popup": "popup.html",
         "default_icon": {
             "16": "icons/icon16.png",
             "48": "icons/icon48.png",
