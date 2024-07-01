@@ -120,125 +120,48 @@ const Enum_day = Object.freeze({
  * 
  * @since 2024/06/08
  * @author 小島佑太
+ * 
+ * @modified 2024/7/1 - 小島佑太 時限と曜日の削除に伴い，プログラムの簡略化をした
  */
 function getTimeTable(){
     let str = "";
 
-    //時間割全体のdivを取得
-    const timetable = Array.from(document.getElementsByClassName('div-table-data-row'));
+    const cells = Array.from(document.getElementsByClassName('permit-student'));
+    cells.forEach((cell) => {
+        //cellのInnerTextを取得
+        const text = cell.innerText;
+        const textArray = text.split("\n");
+        const className = normalizeClassName(textArray[0]);
+        const teacherNames = textArray[1];
 
-    //時間割の行（時間）ごとに処理
-    let time = 1;
-    timetable.forEach((row) => {
-        //各時間ごとの列要素（曜日）を取得
-        const col = [];
-        const yobicol_1 = row.getElementsByClassName('div-table-cell 1-yobicol')[0]; //月曜日
-        const yobicol_2 = row.getElementsByClassName('div-table-cell 2-yobicol')[0]; //火曜日
-        const yobicol_3 = row.getElementsByClassName('div-table-cell 3-yobicol')[0]; //水曜日
-        const yobicol_4 = row.getElementsByClassName('div-table-cell 4-yobicol')[0]; //木曜日
-        const yobicol_5 = row.getElementsByClassName('div-table-cell 5-yobicol')[0]; //金曜日
-        const yobicol_6 = row.getElementsByClassName('div-table-cell 6-yobicol')[0]; //土曜日
-
-        col.push(yobicol_1);
-        col.push(yobicol_2);
-        col.push(yobicol_3);
-        col.push(yobicol_4);
-        col.push(yobicol_5);
-        col.push(yobicol_6);
-
-        //時間割のセルごとに処理，ただし，クォーター制の授業を第１，第２クォーターの両方取っている場合，両方の情報がcellに含まれるため，両方の情報を取得する
-        let day = Enum_day.MON;
-        col.forEach((cell)=>{
-            try{
-                const class_data = Array.from(cell.getElementsByClassName('clearfix permit-student'));
-                if(class_data.length > 0){
-                    class_data.forEach((data) => {
-                        const detail = data.getElementsByClassName('div-table-cell-detail')[0];
-                        const teacherNames = detail.querySelectorAll('span');
-                        let teacherName = "";
-                        teacherNames.forEach((name) => {
-                            //nameから,を削除
-                            let tmp = name.textContent;
-                            tmp = tmp.replace(",", "");
-                            //nameの冒頭のスペースを削除
-                            tmp = tmp.trimStart();
-                            teacherName += tmp;
-                            teacherName += ", ";
-                        });
-                        //最後の,を削除
-                        teacherName = teacherName.slice(0, -2);
-                        str += /*getDay(day) + ", " + time + ", " + */getNameOfClass(data.textContent) + ", " + teacherName + "\n"; // 曜日と時限は必要なくなった．
-                    });
-                }
-                day = (day + 1) % 7;
-            }catch(e){ // エラーが発生した場合，その授業はスキップする．
-                console.error(e);
-            }
-        });
-        time++;
+        str += className + ", " + teacherNames + "\n";        
     });
-
-    console.log(str);
     return str;
 }
 
 /**
- * @function getDay
- * @description enum型の曜日を日本語に変換する．
- * @param {int} day 曜日を表すenum型
- * @return {string} 日本語の曜日，{月, 火, 水, 木, 金, 土, 日}のいずれか，エラーの場合は"エラー"
- * 
- * @since 2024/06/08
- * @auther 小島佑太
- */
-function getDay(day){
-    switch(day){
-        case Enum_day.MON:
-            return "月";
-        case Enum_day.TUE:
-            return "火";
-        case Enum_day.WED:
-            return "水";
-        case Enum_day.THU:
-            return "木";
-        case Enum_day.FRI:
-            return "金";
-        case Enum_day.SAT:
-            return "土";
-        case Enum_day.SUN:
-            return "日";
-        default:
-            return "エラー";
-    }
-}
-
-
-/**
- * @function getNameOfClass
- * @description 授業名を取得する．
- * @param {string} str 授業名が含まれる文字列，形式は<空白>*[授業名]<空白>*[その他の情報]*
+ * @function normalizeClassName
+ * @description 授業名を正規化する．(１Q)と(２Q), (３Q), (４Q)を削除する．全角英数字を半角英数字に変換する．
+ * @param {string} str 授業名が含まれる文字列
  * @return {string} 授業名
  * 
  * @since 2024/06/08
  * @auther 小島佑太
  */
-function getNameOfClass(str){
-    /*
-        入力形式
-        <空白>*[授業名]<空白>*[その他の情報]*
-        出力形式
-        [授業名]
-    */
-
-    //正規表現で授業名を取得
-    const regex = /(\s*)(\S*)(\.*)/;
-    let className = str.match(regex)[2];
-
+function normalizeClassName(className){
     //(１Q)と(２Q)を削除
-    className = className.replace("(１Q)", "");
-    className = className.replace("(２Q)", "");
+    let ret = className.replace("(１Q)", "");
+    ret = ret.replace("(２Q)", "");
+    ret = ret.replace("(３Q)", "");
+    ret = ret.replace("(４Q)", "");
+    
+    //全角英数字を半角英数字に変換
+    ret = ret.replace(/[Ａ-Ｚａ-ｚ０-９]/g, function(s) {
+        return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+    });
+    
 
-    return className;
+    return ret;
 }
 
 
