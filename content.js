@@ -1,6 +1,6 @@
 /**
  * @name content.js
- * @description このスクリプトは，https://scombz.shibaura-it.ac.jp/lms/timetableにボタンを追加し，ボタンをクリックすると時間割情報をクリップボードにコピーするChrome拡張機能．
+ * @description このスクリプトは，https://scombz.shibaura-it.ac.jp/lms/*にボタンを追加し，ボタンをクリックすると時間割情報をクリップボードにコピーするChrome拡張機能．
  * 
  * @since 2024/06/08
  * @author 小島佑太
@@ -221,6 +221,3 @@ function setMessage(){
 
     return message;
 }
-
-
-
