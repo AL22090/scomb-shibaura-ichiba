@@ -15,7 +15,7 @@
     ],
     "content_scripts": [
         {
-            "matches": ["https://scombz.shibaura-it.ac.jp/lms/*"],
+            "matches": ["https://scombz.shibaura-it.ac.jp/lms/timetable*"],
             "js": ["content.js"],
             "run_at": "document_start"
         }
